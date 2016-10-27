@@ -143,7 +143,7 @@ if setuptools is not None:
 
 setup(
     name="censio-tornado",
-    version=version,
+    version="4.0.2.UNKNOWN",
     packages=["tornado", "tornado.test", "tornado.platform"],
     package_data={
         # data files need to be listed both here (which determines what gets
