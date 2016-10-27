@@ -142,7 +142,7 @@ if setuptools is not None:
     kwargs['install_requires'] = install_requires
 
 setup(
-    name="tornado",
+    name="censio-tornado",
     version=version,
     packages=["tornado", "tornado.test", "tornado.platform"],
     package_data={
