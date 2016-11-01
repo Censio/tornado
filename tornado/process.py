@@ -28,6 +28,7 @@ import sys
 import time
 
 from binascii import hexlify
+import psutil
 
 from tornado.concurrent import Future
 from tornado import ioloop
@@ -97,7 +98,7 @@ def _pipe_cloexec():
 _task_id = None
 
 
-def fork_processes(num_processes, max_restarts=100):
+def fork_processes(num_processes, max_restarts=100, set_affinity=False, enforce_all_cores=True):
     """Starts multiple worker processes.
 
     If ``num_processes`` is None or <= 0, we detect the number of cores
@@ -124,8 +125,23 @@ def fork_processes(num_processes, max_restarts=100):
     """
     global _task_id
     assert _task_id is None
+    num_cores = cpu_count()
     if num_processes is None or num_processes <= 0:
-        num_processes = cpu_count()
+        num_processes = num_cores
+    elif set_affinity:
+        if num_processes > num_cores:
+            raise RuntimeError(
+                "Using AFFINITY tornado mode, number of processes to fork cannot be more than the number of CPU cores"
+            )
+        elif num_processes != num_cores:
+            message = "Using AFFINITY tornado mode and number of processes to fork ({}) != number of CPU cores ({})".format(
+                num_processes, num_cores
+            )
+            if enforce_all_cores:
+                raise RuntimeError(message)
+            else:
+                gen_log.warning(message)
+
     if ioloop.IOLoop.initialized():
         raise RuntimeError("Cannot run in multiple processes: IOLoop instance "
                            "has already been initialized. You cannot call "
@@ -136,6 +152,10 @@ def fork_processes(num_processes, max_restarts=100):
     def start_child(i):
         pid = os.fork()
         if pid == 0:
+            if set_affinity:
+                gen_log.debug("Setting process affinity for CPU core [%s]", i)
+                process = psutil.Process()
+                process.cpu_affinity([i])
             # child process
             _reseed_random()
             global _task_id

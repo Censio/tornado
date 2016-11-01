@@ -139,6 +139,7 @@ if setuptools is not None:
         install_requires.append('certifi')
     if sys.version_info < (3, 5):
         install_requires.append('backports_abc>=0.4')
+    install_requires.append('psutil==4.4.2')
     kwargs['install_requires'] = install_requires
 
 setup(
