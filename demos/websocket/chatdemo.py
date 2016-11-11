@@ -19,20 +19,20 @@ Authentication, error handling, etc are left as an exercise for the reader :)
 """
 
 import logging
-import tornado.escape
-import tornado.ioloop
-import tornado.options
-import tornado.web
-import tornado.websocket
+import censiotornado.escape
+import censiotornado.ioloop
+import censiotornado.options
+import censiotornado.web
+import censiotornado.websocket
 import os.path
 import uuid
 
-from tornado.options import define, options
+from censiotornado.options import define, options
 
 define("port", default=8888, help="run on the given port", type=int)
 
 
-class Application(tornado.web.Application):
+class Application(censiotornado.web.Application):
     def __init__(self):
         handlers = [
             (r"/", MainHandler),
@@ -47,11 +47,11 @@ class Application(tornado.web.Application):
         super(Application, self).__init__(handlers, **settings)
 
 
-class MainHandler(tornado.web.RequestHandler):
+class MainHandler(censiotornado.web.RequestHandler):
     def get(self):
         self.render("index.html", messages=ChatSocketHandler.cache)
 
-class ChatSocketHandler(tornado.websocket.WebSocketHandler):
+class ChatSocketHandler(censiotornado.websocket.WebSocketHandler):
     waiters = set()
     cache = []
     cache_size = 200
@@ -83,12 +83,12 @@ class ChatSocketHandler(tornado.websocket.WebSocketHandler):
 
     def on_message(self, message):
         logging.info("got message %r", message)
-        parsed = tornado.escape.json_decode(message)
+        parsed = censiotornado.escape.json_decode(message)
         chat = {
             "id": str(uuid.uuid4()),
             "body": parsed["body"],
             }
-        chat["html"] = tornado.escape.to_basestring(
+        chat["html"] = censiotornado.escape.to_basestring(
             self.render_string("message.html", message=chat))
 
         ChatSocketHandler.update_cache(chat)
@@ -96,10 +96,10 @@ class ChatSocketHandler(tornado.websocket.WebSocketHandler):
 
 
 def main():
-    tornado.options.parse_command_line()
+    censiotornado.options.parse_command_line()
     app = Application()
     app.listen(options.port)
-    tornado.ioloop.IOLoop.current().start()
+    censiotornado.ioloop.IOLoop.current().start()
 
 
 if __name__ == "__main__":

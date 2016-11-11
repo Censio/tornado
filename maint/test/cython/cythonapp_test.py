@@ -1,5 +1,5 @@
-from tornado.testing import AsyncTestCase, gen_test
-from tornado.util import ArgReplacer
+from censiotornado.testing import AsyncTestCase, gen_test
+from censiotornado.util import ArgReplacer
 import unittest
 
 import cythonapp

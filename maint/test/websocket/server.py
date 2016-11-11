@@ -1,9 +1,9 @@
 #!/usr/bin/env python
 
-from tornado.ioloop import IOLoop
-from tornado.options import define, options, parse_command_line
-from tornado.websocket import WebSocketHandler
-from tornado.web import Application
+from censiotornado.ioloop import IOLoop
+from censiotornado.options import define, options, parse_command_line
+from censiotornado.websocket import WebSocketHandler
+from censiotornado.web import Application
 
 define('port', default=9000)
 

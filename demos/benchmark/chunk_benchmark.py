@@ -3,11 +3,11 @@
 # Downloads a large file in chunked encoding with both curl and simple clients
 
 import logging
-from tornado.curl_httpclient import CurlAsyncHTTPClient
-from tornado.simple_httpclient import SimpleAsyncHTTPClient
-from tornado.ioloop import IOLoop
-from tornado.options import define, options, parse_command_line
-from tornado.web import RequestHandler, Application
+from censiotornado.curl_httpclient import CurlAsyncHTTPClient
+from censiotornado.simple_httpclient import SimpleAsyncHTTPClient
+from censiotornado.ioloop import IOLoop
+from censiotornado.options import define, options, parse_command_line
+from censiotornado.web import RequestHandler, Application
 
 define('port', default=8888)
 define('num_chunks', default=1000)

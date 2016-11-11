@@ -1,9 +1,9 @@
 import logging
-from tornado.ioloop import IOLoop
-from tornado import gen
-from tornado.iostream import StreamClosedError
-from tornado.tcpserver import TCPServer
-from tornado.options import options, define
+from censiotornado.ioloop import IOLoop
+from censiotornado import gen
+from censiotornado.iostream import StreamClosedError
+from censiotornado.tcpserver import TCPServer
+from censiotornado.options import options, define
 
 define("port", default=9888, help="TCP port to listen on")
 logger = logging.getLogger(__name__)

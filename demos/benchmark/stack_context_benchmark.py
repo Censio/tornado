@@ -6,7 +6,7 @@ import functools
 import subprocess
 import sys
 
-from tornado import stack_context
+from censiotornado import stack_context
 
 class Benchmark(object):
     def enter_exit(self, count):

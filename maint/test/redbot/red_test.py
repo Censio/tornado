@@ -5,10 +5,10 @@ from redbot.resource import HttpResource
 import redbot.speak as rs
 import thor
 import threading
-from tornado import gen
-from tornado.options import parse_command_line
-from tornado.testing import AsyncHTTPTestCase, LogTrapTestCase
-from tornado.web import RequestHandler, Application, asynchronous
+from censiotornado import gen
+from censiotornado.options import parse_command_line
+from censiotornado.testing import AsyncHTTPTestCase, LogTrapTestCase
+from censiotornado.web import RequestHandler, Application, asynchronous
 import unittest
 
 class HelloHandler(RequestHandler):

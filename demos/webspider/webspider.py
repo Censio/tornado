@@ -10,7 +10,7 @@ except ImportError:
     from html.parser import HTMLParser
     from urllib.parse import urljoin, urldefrag
 
-from tornado import httpclient, gen, ioloop, queues
+from censiotornado import httpclient, gen, ioloop, queues
 
 base_url = 'http://www.tornadoweb.org/en/stable/'
 concurrency = 10

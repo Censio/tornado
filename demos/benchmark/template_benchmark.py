@@ -6,8 +6,8 @@
 import sys
 from timeit import Timer
 
-from tornado.options import options, define, parse_command_line
-from tornado.template import Template
+from censiotornado.options import options, define, parse_command_line
+from censiotornado.template import Template
 
 define('num', default=100, help='number of iterations')
 define('dump', default=False, help='print template generated code and exit')

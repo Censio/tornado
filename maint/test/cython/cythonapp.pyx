@@ -1,5 +1,5 @@
 import cython
-from tornado import gen
+from censiotornado import gen
 import pythonmodule
 
 async def native_coroutine():

@@ -3,14 +3,14 @@ import os
 import sys
 import time
 sys.path.insert(0, os.path.abspath(".."))
-import tornado
+import censiotornado
 
 master_doc = "index"
 
 project = "Tornado"
 copyright = "2009-%s, The Tornado Authors" % time.strftime("%Y")
 
-version = release = tornado.version
+version = release = censiotornado.version
 
 extensions = [
     "sphinx.ext.autodoc",

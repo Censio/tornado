@@ -17,9 +17,9 @@
 import functools
 import os.path
 import re
-import tornado.escape
-import tornado.web
-import tornado.wsgi
+import censiotornado.escape
+import censiotornado.web
+import censiotornado.wsgi
 import unicodedata
 
 from google.appengine.api import users
@@ -45,18 +45,18 @@ def administrator(method):
             if self.request.method == "GET":
                 self.redirect(self.get_login_url())
                 return
-            raise tornado.web.HTTPError(403)
+            raise censiotornado.web.HTTPError(403)
         elif not self.current_user.administrator:
             if self.request.method == "GET":
                 self.redirect("/")
                 return
-            raise tornado.web.HTTPError(403)
+            raise censiotornado.web.HTTPError(403)
         else:
             return method(self, *args, **kwargs)
     return wrapper
 
 
-class BaseHandler(tornado.web.RequestHandler):
+class BaseHandler(censiotornado.web.RequestHandler):
     """Implements Google Accounts authentication methods."""
     def get_current_user(self):
         user = users.get_current_user()
@@ -86,7 +86,7 @@ class HomeHandler(BaseHandler):
 class EntryHandler(BaseHandler):
     def get(self, slug):
         entry = db.Query(Entry).filter("slug =", slug).get()
-        if not entry: raise tornado.web.HTTPError(404)
+        if not entry: raise censiotornado.web.HTTPError(404)
         self.render("entry.html", entry=entry)
 
 
@@ -117,7 +117,7 @@ class ComposeHandler(BaseHandler):
             entry = Entry.get(key)
             entry.title = self.get_argument("title")
             entry.body_source = self.get_argument("body_source")
-            entry.html = tornado.escape.linkify(
+            entry.html = censiotornado.escape.linkify(
                 self.get_argument("body_source"))
         else:
             title = self.get_argument("title")
@@ -136,13 +136,13 @@ class ComposeHandler(BaseHandler):
                 title=title,
                 slug=slug,
                 body_source=self.get_argument("body_source"),
-                html=tornado.escape.linkify(self.get_argument("body_source")),
+                html=censiotornado.escape.linkify(self.get_argument("body_source")),
             )
         entry.put()
         self.redirect("/entry/" + entry.slug)
 
 
-class EntryModule(tornado.web.UIModule):
+class EntryModule(censiotornado.web.UIModule):
     def render(self, entry):
         return self.render_string("modules/entry.html", entry=entry)
 
@@ -153,7 +153,7 @@ settings = {
     "ui_modules": {"Entry": EntryModule},
     "xsrf_cookies": True,
 }
-application = tornado.web.Application([
+application = censiotornado.web.Application([
     (r"/", HomeHandler),
     (r"/archive", ArchiveHandler),
     (r"/feed", FeedHandler),
@@ -161,4 +161,4 @@ application = tornado.web.Application([
     (r"/compose", ComposeHandler),
 ], **settings)
 
-application = tornado.wsgi.WSGIAdapter(application)
+application = censiotornado.wsgi.WSGIAdapter(application)

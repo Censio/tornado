@@ -15,15 +15,15 @@
 # under the License.
 
 import logging
-import tornado.escape
-import tornado.ioloop
-import tornado.web
+import censiotornado.escape
+import censiotornado.ioloop
+import censiotornado.web
 import os.path
 import uuid
 
-from tornado.concurrent import Future
-from tornado import gen
-from tornado.options import define, options, parse_command_line
+from censiotornado.concurrent import Future
+from censiotornado import gen
+from censiotornado.options import define, options, parse_command_line
 
 define("port", default=8888, help="run on the given port", type=int)
 define("debug", default=False, help="run in debug mode")
@@ -72,12 +72,12 @@ class MessageBuffer(object):
 global_message_buffer = MessageBuffer()
 
 
-class MainHandler(tornado.web.RequestHandler):
+class MainHandler(censiotornado.web.RequestHandler):
     def get(self):
         self.render("index.html", messages=global_message_buffer.cache)
 
 
-class MessageNewHandler(tornado.web.RequestHandler):
+class MessageNewHandler(censiotornado.web.RequestHandler):
     def post(self):
         message = {
             "id": str(uuid.uuid4()),
@@ -85,7 +85,7 @@ class MessageNewHandler(tornado.web.RequestHandler):
         }
         # to_basestring is necessary for Python 3's json encoder,
         # which doesn't accept byte strings.
-        message["html"] = tornado.escape.to_basestring(
+        message["html"] = censiotornado.escape.to_basestring(
             self.render_string("message.html", message=message))
         if self.get_argument("next", None):
             self.redirect(self.get_argument("next"))
@@ -94,7 +94,7 @@ class MessageNewHandler(tornado.web.RequestHandler):
         global_message_buffer.new_messages([message])
 
 
-class MessageUpdatesHandler(tornado.web.RequestHandler):
+class MessageUpdatesHandler(censiotornado.web.RequestHandler):
     @gen.coroutine
     def post(self):
         cursor = self.get_argument("cursor", None)
@@ -112,7 +112,7 @@ class MessageUpdatesHandler(tornado.web.RequestHandler):
 
 def main():
     parse_command_line()
-    app = tornado.web.Application(
+    app = censiotornado.web.Application(
         [
             (r"/", MainHandler),
             (r"/a/message/new", MessageNewHandler),
@@ -125,7 +125,7 @@ def main():
         debug=options.debug,
         )
     app.listen(options.port)
-    tornado.ioloop.IOLoop.current().start()
+    censiotornado.ioloop.IOLoop.current().start()
 
 
 if __name__ == "__main__":

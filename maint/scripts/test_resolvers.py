@@ -4,10 +4,10 @@ from __future__ import print_function
 import pprint
 import socket
 
-from tornado import gen
-from tornado.ioloop import IOLoop
-from tornado.netutil import Resolver, ThreadedResolver
-from tornado.options import parse_command_line, define, options
+from censiotornado import gen
+from censiotornado.ioloop import IOLoop
+from censiotornado.netutil import Resolver, ThreadedResolver
+from censiotornado.options import parse_command_line, define, options
 
 try:
     import twisted
@@ -33,11 +33,11 @@ def main():
     resolvers = [Resolver(), ThreadedResolver()]
 
     if twisted is not None:
-        from tornado.platform.twisted import TwistedResolver
+        from censiotornado.platform.twisted import TwistedResolver
         resolvers.append(TwistedResolver())
 
     if pycares is not None:
-        from tornado.platform.caresresolver import CaresResolver
+        from censiotornado.platform.caresresolver import CaresResolver
         resolvers.append(CaresResolver())
 
     family = {

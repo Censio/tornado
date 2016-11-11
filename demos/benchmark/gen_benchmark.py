@@ -6,8 +6,8 @@
 
 from timeit import Timer
 
-from tornado import gen
-from tornado.options import options, define, parse_command_line
+from censiotornado import gen
+from censiotornado.options import options, define, parse_command_line
 
 define('num', default=10000, help='number of iterations')
 

@@ -38,10 +38,10 @@ import os
 import os.path
 import urllib
 
-from tornado import escape
-from tornado import httpserver
-from tornado import ioloop
-from tornado import web
+from censiotornado import escape
+from censiotornado import httpserver
+from censiotornado import ioloop
+from censiotornado import web
 
 def start(port, root_directory="/tmp/s3", bucket_depth=0):
     """Starts the mock S3 server on the given port at the given path."""

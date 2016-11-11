@@ -14,9 +14,9 @@
 # % sort time
 # % stats 20
 
-from tornado.ioloop import IOLoop
-from tornado.options import define, options, parse_command_line
-from tornado.web import RequestHandler, Application
+from censiotornado.ioloop import IOLoop
+from censiotornado.options import define, options, parse_command_line
+from censiotornado.web import RequestHandler, Application
 
 import random
 import signal

@@ -1,8 +1,8 @@
 from __future__ import print_function
-from tornado.ioloop import IOLoop
-from tornado import gen
-from tornado.tcpclient import TCPClient
-from tornado.options import options, define
+from censiotornado.ioloop import IOLoop
+from censiotornado import gen
+from censiotornado.tcpclient import TCPClient
+from censiotornado.options import options, define
 
 define("host", default="localhost", help="TCP server host")
 define("port", default=9888, help="TCP port to connect to")

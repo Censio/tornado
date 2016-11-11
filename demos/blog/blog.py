@@ -22,15 +22,15 @@ import os.path
 import re
 import subprocess
 import torndb
-import tornado.escape
-from tornado import gen
-import tornado.httpserver
-import tornado.ioloop
-import tornado.options
-import tornado.web
+import censiotornado.escape
+from censiotornado import gen
+import censiotornado.httpserver
+import censiotornado.ioloop
+import censiotornado.options
+import censiotornado.web
 import unicodedata
 
-from tornado.options import define, options
+from censiotornado.options import define, options
 
 define("port", default=8888, help="run on the given port", type=int)
 define("mysql_host", default="127.0.0.1:3306", help="blog database host")
@@ -43,7 +43,7 @@ define("mysql_password", default="blog", help="blog database password")
 executor = concurrent.futures.ThreadPoolExecutor(2)
 
 
-class Application(tornado.web.Application):
+class Application(censiotornado.web.Application):
     def __init__(self):
         handlers = [
             (r"/", HomeHandler),
@@ -85,7 +85,7 @@ class Application(tornado.web.Application):
                                   stdin=open('schema.sql'))
 
 
-class BaseHandler(tornado.web.RequestHandler):
+class BaseHandler(censiotornado.web.RequestHandler):
     @property
     def db(self):
         return self.application.db
@@ -112,7 +112,7 @@ class HomeHandler(BaseHandler):
 class EntryHandler(BaseHandler):
     def get(self, slug):
         entry = self.db.get("SELECT * FROM entries WHERE slug = %s", slug)
-        if not entry: raise tornado.web.HTTPError(404)
+        if not entry: raise censiotornado.web.HTTPError(404)
         self.render("entry.html", entry=entry)
 
 
@@ -132,7 +132,7 @@ class FeedHandler(BaseHandler):
 
 
 class ComposeHandler(BaseHandler):
-    @tornado.web.authenticated
+    @censiotornado.web.authenticated
     def get(self):
         id = self.get_argument("id", None)
         entry = None
@@ -140,7 +140,7 @@ class ComposeHandler(BaseHandler):
             entry = self.db.get("SELECT * FROM entries WHERE id = %s", int(id))
         self.render("compose.html", entry=entry)
 
-    @tornado.web.authenticated
+    @censiotornado.web.authenticated
     def post(self):
         id = self.get_argument("id", None)
         title = self.get_argument("title")
@@ -148,7 +148,7 @@ class ComposeHandler(BaseHandler):
         html = markdown.markdown(text)
         if id:
             entry = self.db.get("SELECT * FROM entries WHERE id = %s", int(id))
-            if not entry: raise tornado.web.HTTPError(404)
+            if not entry: raise censiotornado.web.HTTPError(404)
             slug = entry.slug
             self.db.execute(
                 "UPDATE entries SET title = %s, markdown = %s, html = %s "
@@ -177,9 +177,9 @@ class AuthCreateHandler(BaseHandler):
     @gen.coroutine
     def post(self):
         if self.any_author_exists():
-            raise tornado.web.HTTPError(400, "author already created")
+            raise censiotornado.web.HTTPError(400, "author already created")
         hashed_password = yield executor.submit(
-            bcrypt.hashpw, tornado.escape.utf8(self.get_argument("password")),
+            bcrypt.hashpw, censiotornado.escape.utf8(self.get_argument("password")),
             bcrypt.gensalt())
         author_id = self.db.execute(
             "INSERT INTO authors (email, name, hashed_password) "
@@ -206,8 +206,8 @@ class AuthLoginHandler(BaseHandler):
             self.render("login.html", error="email not found")
             return
         hashed_password = yield executor.submit(
-            bcrypt.hashpw, tornado.escape.utf8(self.get_argument("password")),
-            tornado.escape.utf8(author.hashed_password))
+            bcrypt.hashpw, censiotornado.escape.utf8(self.get_argument("password")),
+            censiotornado.escape.utf8(author.hashed_password))
         if hashed_password == author.hashed_password:
             self.set_secure_cookie("blogdemo_user", str(author.id))
             self.redirect(self.get_argument("next", "/"))
@@ -221,16 +221,16 @@ class AuthLogoutHandler(BaseHandler):
         self.redirect(self.get_argument("next", "/"))
 
 
-class EntryModule(tornado.web.UIModule):
+class EntryModule(censiotornado.web.UIModule):
     def render(self, entry):
         return self.render_string("modules/entry.html", entry=entry)
 
 
 def main():
-    tornado.options.parse_command_line()
-    http_server = tornado.httpserver.HTTPServer(Application())
+    censiotornado.options.parse_command_line()
+    http_server = censiotornado.httpserver.HTTPServer(Application())
     http_server.listen(options.port)
-    tornado.ioloop.IOLoop.current().start()
+    censiotornado.ioloop.IOLoop.current().start()
 
 
 if __name__ == "__main__":

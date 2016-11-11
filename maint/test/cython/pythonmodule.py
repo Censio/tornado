@@ -1,4 +1,4 @@
-from tornado import gen
+from censiotornado import gen
 
 @gen.coroutine
 def hello():

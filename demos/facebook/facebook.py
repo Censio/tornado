@@ -15,21 +15,21 @@
 # under the License.
 
 import os.path
-import tornado.auth
-import tornado.escape
-import tornado.httpserver
-import tornado.ioloop
-import tornado.options
-import tornado.web
+import censiotornado.auth
+import censiotornado.escape
+import censiotornado.httpserver
+import censiotornado.ioloop
+import censiotornado.options
+import censiotornado.web
 
-from tornado.options import define, options
+from censiotornado.options import define, options
 
 define("port", default=8888, help="run on the given port", type=int)
 define("facebook_api_key", help="your Facebook application API key", type=str)
 define("facebook_secret", help="your Facebook application secret", type=str)
 
 
-class Application(tornado.web.Application):
+class Application(censiotornado.web.Application):
     def __init__(self):
         handlers = [
             (r"/", MainHandler),
@@ -48,19 +48,19 @@ class Application(tornado.web.Application):
             debug=True,
             autoescape=None,
         )
-        tornado.web.Application.__init__(self, handlers, **settings)
+        censiotornado.web.Application.__init__(self, handlers, **settings)
 
 
-class BaseHandler(tornado.web.RequestHandler):
+class BaseHandler(censiotornado.web.RequestHandler):
     def get_current_user(self):
         user_json = self.get_secure_cookie("fbdemo_user")
         if not user_json: return None
-        return tornado.escape.json_decode(user_json)
+        return censiotornado.escape.json_decode(user_json)
 
 
-class MainHandler(BaseHandler, tornado.auth.FacebookGraphMixin):
-    @tornado.web.authenticated
-    @tornado.web.asynchronous
+class MainHandler(BaseHandler, censiotornado.auth.FacebookGraphMixin):
+    @censiotornado.web.authenticated
+    @censiotornado.web.asynchronous
     def get(self):
         self.facebook_request("/me/home", self._on_stream,
                               access_token=self.current_user["access_token"])
@@ -73,12 +73,12 @@ class MainHandler(BaseHandler, tornado.auth.FacebookGraphMixin):
         self.render("stream.html", stream=stream)
 
 
-class AuthLoginHandler(BaseHandler, tornado.auth.FacebookGraphMixin):
-    @tornado.web.asynchronous
+class AuthLoginHandler(BaseHandler, censiotornado.auth.FacebookGraphMixin):
+    @censiotornado.web.asynchronous
     def get(self):
         my_url = (self.request.protocol + "://" + self.request.host +
                   "/auth/login?next=" +
-                  tornado.escape.url_escape(self.get_argument("next", "/")))
+                  censiotornado.escape.url_escape(self.get_argument("next", "/")))
         if self.get_argument("code", False):
             self.get_authenticated_user(
                 redirect_uri=my_url,
@@ -93,30 +93,30 @@ class AuthLoginHandler(BaseHandler, tornado.auth.FacebookGraphMixin):
 
     def _on_auth(self, user):
         if not user:
-            raise tornado.web.HTTPError(500, "Facebook auth failed")
-        self.set_secure_cookie("fbdemo_user", tornado.escape.json_encode(user))
+            raise censiotornado.web.HTTPError(500, "Facebook auth failed")
+        self.set_secure_cookie("fbdemo_user", censiotornado.escape.json_encode(user))
         self.redirect(self.get_argument("next", "/"))
 
 
-class AuthLogoutHandler(BaseHandler, tornado.auth.FacebookGraphMixin):
+class AuthLogoutHandler(BaseHandler, censiotornado.auth.FacebookGraphMixin):
     def get(self):
         self.clear_cookie("fbdemo_user")
         self.redirect(self.get_argument("next", "/"))
 
 
-class PostModule(tornado.web.UIModule):
+class PostModule(censiotornado.web.UIModule):
     def render(self, post):
         return self.render_string("modules/post.html", post=post)
 
 
 def main():
-    tornado.options.parse_command_line()
+    censiotornado.options.parse_command_line()
     if not (options.facebook_api_key and options.facebook_secret):
         print("--facebook_api_key and --facebook_secret must be set")
         return
-    http_server = tornado.httpserver.HTTPServer(Application())
+    http_server = censiotornado.httpserver.HTTPServer(Application())
     http_server.listen(options.port)
-    tornado.ioloop.IOLoop.current().start()
+    censiotornado.ioloop.IOLoop.current().start()
 
 
 if __name__ == "__main__":
