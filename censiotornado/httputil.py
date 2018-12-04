@@ -808,6 +808,7 @@ def parse_request_start_line(line):
     try:
         method, path, version = line.split(" ")
     except ValueError:
+        gen_log.warning("Malformed HTTP request line: %s", line)
         raise HTTPInputError("Malformed HTTP request line")
     if not re.match(r"^HTTP/1\.[0-9]$", version):
         raise HTTPInputError(
